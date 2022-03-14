@@ -51,7 +51,7 @@ async def encode(filepath):
         print('[Encode]: ' + filepath)
 
     # Codec and Bits
-    codec = '-c:v libx264 -pix_fmt yuv420p'
+    codec = '-c:v libx265 -pix_fmt yuv420p -b:v 0.75M'
 
     # CRF
     crf = f'-crf {c}'
@@ -69,7 +69,7 @@ async def encode(filepath):
         preset = '-preset medium'
 
     # Optional
-    video_opts = f'-tune {t} -map 0:v? -map_chapters 0 -map_metadata 0'
+    video_opts = f'-tune {t} -map 0:v? -map_chapters 0 -map_metadata 0 -r 23.976 -color_primaries 1 -color_trc 1 -color_range 2 -colorspace bt709 -x265-params frame-threads=3:aq-mode=3:bframes=8:b-adapt=2'
 
     # Copy Subtitles
     subs_i = get_codec(filepath, channel='s:0')
@@ -82,11 +82,11 @@ async def encode(filepath):
     a_i = get_codec(filepath, channel='a:0')
     a = audio
     if a_i == []:
-        audio_opts = ''
+        audio_opts = '-c:a libfdk_aac -profile:a aac_he -b:a 128k'
     else:
         audio_opts = '-map 0:a?'
         if a == 'aac':
-            audio_opts += ' -c:a aac -b:a 128k'
+            audio_opts += ' -c:a libfdk_aac -b:a 128k'
         elif a == 'opus':
             audio_opts += ' -c:a libopus -vbr on -b:a 96k'
         elif a == 'copy':
